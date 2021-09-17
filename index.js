@@ -1,20 +1,22 @@
 // RPN Calculator
-// 1- Insert 1st and 2nd value and save it in stack
-// 2- Give options to pick one of the operators and end the math operation (+, -, *, /) or enter another number
-// 3- If one of the operators is chosen show the result and then give
-// option to start a new math problem or end the program,
-// if the user chooses to enter another number then show option 2 again.
-//
-
 var inquirer = require("inquirer");
 //creating a class object
 class Rpn {
   constructor() {
     this.number = [];
+    this.count = 0;
   }
   push(element) {
-    console.log(`${element} was pushed to stack`);
-    return element;
+    this.number[this.count] = element;
+    console.log(`You entered number: ${element}`);
+    this.count++;
+    return this.count - 1;
+  }
+
+  pop() {
+    let removedItem = this.number[this.count - 1];
+    this.count--;
+    return removedItem;
   }
 }
 // new object. Here is where I want to stack the numbers
@@ -33,36 +35,64 @@ function promptUser() {
 
 //for 3rd number and after
 function options() {
-  return inquirer.prompt([
-    {
-      type: "list",
-      message: "Do you wish to enter another number?",
-      name: "options",
-      choices: ["yes", "no"],
-    },
-  ]);
+  return inquirer
+    .prompt([
+      {
+        name: "wants_new_number",
+        type: "confirm",
+        message: "Do you wish to enter another number?",
+      },
+    ])
+    .then((answer) => {
+      if (answer.wants_new_number === true) {
+        init();
+      } else {
+        operators();
+      }
+    });
 }
 
-async function init1() {
+//for single number
+async function init() {
   const promptFunc = await promptUser();
   let userVal = promptFunc.value;
   if (isNaN(userVal)) {
     console.log("Please enter a number!");
-    init1();
+    init();
   } else {
     rpn.push(userVal);
-    init2();
+    options();
   }
 }
-init1();
 
-async function init2() {
-  const promptFunc = await promptUser();
-  let userVal = promptFunc.value;
-  if (isNaN(userVal)) {
-    console.log("Please enter a number!");
-    init1();
-  } else {
-    rpn.push(userVal);
-  }
+function operators() {
+  return inquirer
+    .prompt([
+      {
+        type: "list",
+        message: "Please select one operator",
+        name: "operators",
+        choices: ["+", "-", "*", "/"],
+      },
+    ])
+    .then((answer) => {
+      if (answer.operators === "+") {
+        rpn.push(rpn.pop() + rpn.pop());
+      } else if (answer.operators === "-") {
+        let min1 = rpn.pop();
+        let min2 = rpn.pop();
+        rpn.push(min2 - min1);
+      } else if (answer.operators === "*") {
+        rpn.push(rpn.pop() * rpn.pop());
+      } else if (answer.operators === "/") {
+        let div1 = rpn.pop();
+        let div2 = rpn.pop();
+        rpn.push(div2 / div1);
+      }
+      if (rpn.number.length >= 2) {
+        options();
+      }
+    });
 }
+
+init();
