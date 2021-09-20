@@ -1,6 +1,6 @@
 // RPN Calculator
 var inquirer = require("inquirer");
-//creating a class object
+
 class Rpn {
   constructor() {
     this.number = [];
@@ -8,7 +8,7 @@ class Rpn {
   }
   push(element) {
     this.number[this.count] = element;
-    console.log(`You entered number: ${element}`);
+    console.log(`New Value: ${element}`);
     this.count++;
     return this.count - 1;
   }
@@ -22,18 +22,18 @@ class Rpn {
 // new object. Here is where I want to stack the numbers
 const rpn = new Rpn();
 
-//ask user for at least first 2 numbers...
+//ask user for at least for a number
 function promptUser() {
   return inquirer.prompt([
     {
-      type: "number",
+      type: "input",
       name: "value",
       message: "Enter number",
     },
   ]);
 }
 
-//for 3rd number and after
+//Do you wish to enter another number?
 function options() {
   return inquirer
     .prompt([
@@ -46,22 +46,34 @@ function options() {
     .then((answer) => {
       if (answer.wants_new_number === true) {
         init();
-      } else {
+      } else if (rpn.count >= 2) {
         operators();
+      } else {
+        console.log("End!");
       }
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
 
-//for single number
+//This function starts the process of asking for number and validating that it was a number that was entered.
 async function init() {
-  const promptFunc = await promptUser();
-  let userVal = promptFunc.value;
-  if (isNaN(userVal)) {
-    console.log("Please enter a number!");
-    init();
-  } else {
-    rpn.push(userVal);
-    options();
+  try {
+    const promptFunc = await promptUser();
+
+    let userVal = promptFunc.value;
+    if (userVal === "q") {
+      console.log("Quit!");
+    } else if (isNaN(userVal)) {
+      console.log("Please enter a number!");
+      init();
+    } else {
+      rpn.push(Number(userVal));
+      options();
+    }
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -92,6 +104,9 @@ function operators() {
       if (rpn.number.length >= 2) {
         options();
       }
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
 
