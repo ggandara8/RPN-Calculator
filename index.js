@@ -1,14 +1,17 @@
-// RPN Calculator
-var inquirer = require("inquirer");
+const inquirer = require("inquirer");
+const chalk = require("chalk");
+const figlet = require("figlet");
 
 class Rpn {
   constructor() {
     this.number = [];
     this.count = 0;
   }
-  push(element) {
-    this.number[this.count] = element;
-    console.log(`New Value: ${element}`);
+  push(item) {
+    this.number[this.count] = item;
+    console.log(
+      chalk.greenBright.bold.underline(`You Entered Number: ${item}`)
+    );
     this.count++;
     return this.count - 1;
   }
@@ -22,7 +25,7 @@ class Rpn {
 // new object. Here is where I want to stack the numbers
 const rpn = new Rpn();
 
-//ask user for at least for a number
+//ask user for at least one number
 function promptUser() {
   return inquirer.prompt([
     {
@@ -33,7 +36,7 @@ function promptUser() {
   ]);
 }
 
-//Do you wish to enter another number?
+//Asks the user if he wants to enter another number
 function options() {
   return inquirer
     .prompt([
@@ -57,11 +60,10 @@ function options() {
     });
 }
 
-//This function starts the process of asking for number and validating that it was a number that was entered.
+//This function validates if a number was entered or not.
 async function init() {
   try {
     const promptFunc = await promptUser();
-
     let userVal = promptFunc.value;
     if (userVal === "q") {
       console.log("Quit!");
@@ -69,14 +71,14 @@ async function init() {
       console.log("Please enter a number!");
       init();
     } else {
-      rpn.push(Number(userVal));
+      rpn.push(Number(userVal)); //Changes from string to Number
       options();
     }
   } catch (err) {
     console.log(err);
   }
 }
-
+// This function is asks for an operator and does the Math.
 function operators() {
   return inquirer
     .prompt([
@@ -109,5 +111,8 @@ function operators() {
       console.log(err);
     });
 }
-
+console.log(
+  chalk.yellow(figlet.textSync("RPN Calculator!", { horizontalLayout: "full" }))
+);
+// Init function starts the calculator.
 init();
