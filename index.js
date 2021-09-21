@@ -78,7 +78,7 @@ async function init() {
     console.log(err);
   }
 }
-// This function is asks for an operator and does the Math.
+// This function asks for an operator and does the Math.
 function operators() {
   return inquirer
     .prompt([
