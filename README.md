@@ -1,4 +1,4 @@
-![RPN Calculator](/assets/RPN-title-img.jpg)
+# RPN Calculator
 
 ## Description
 
